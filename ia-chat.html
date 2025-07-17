@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat IA - Demo UNLu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+        }
+
+        /* Navbar styles (solo escritorio) */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10), 0 1.5px 0 #764ba2;
+            z-index: 1000;
+            border-bottom: 1.5px solid #e2e8f0;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .nav-logo img {
+            height: 44px;
+            transition: transform 0.3s cubic-bezier(.4,2,.6,1);
+            filter: drop-shadow(0 2px 8px rgba(102,126,234,0.10));
+        }
+        .nav-logo:hover img {
+            transform: scale(1.08) rotate(-2deg);
+        }
+        .menu {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            margin: 0;
+            padding: 0;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.08rem;
+            letter-spacing: 0.01em;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+        }
+        .menu a:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+        }
+        .nav-logo-right {
+            display: flex;
+            align-items: center;
+        }
+        /* Fin navbar escritorio */
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        /* Mejorar input y botones del chat */
+        .chat-input input {
+            border: 2.5px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1.08rem;
+            padding: 1.1rem;
+            transition: border-color 0.3s;
+        }
+        .chat-input input:focus {
+            border-color: #764ba2;
+            box-shadow: 0 0 0 2px #764ba233;
+        }
+        .send-btn {
+            padding: 1.1rem 1.7rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.08rem;
+            transition: all 0.3s;
+        }
+        .send-btn:hover {
+            filter: brightness(1.08) drop-shadow(0 2px 8px rgba(102,126,234,0.10));
+        }
+        .chat-messages {
+            background: #f7fafc;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(102,126,234,0.06);
+        }
+        .message-content {
+            font-size: 1.08rem;
+            line-height: 1.7;
+        }
+        .message.ai .message-content {
+            background: #fff;
+            color: #2d3748;
+            border-left: 4px solid #667eea;
+        }
+        .message.user .message-content {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: #fff;
+            border-left: 4px solid #38a169;
+        }
+        .typing-indicator {
+            color: #764ba2;
+            font-weight: 600;
+            font-size: 1.05rem;
+        }
+        /* Mejorar layout general */
+        .container {
+            max-width: 800px;
+            margin: 2.5rem auto;
+            padding: 0 2rem;
+            background: rgba(255,255,255,0.92);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.08);
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .chat-header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f7fafc;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .message.ai .message-avatar {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 70%;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .message.ai .message-content {
+            background: white;
+            color: #2d3748;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-top: 0.5rem;
+        }
+
+        .chat-input {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .send-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 1rem;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .typing-indicator.show {
+            display: block;
+        }
+
+        .suggestions {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestions h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .suggestion-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .suggestion-btn {
+            padding: 1rem;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            font-size: 0.9rem;
+            color: #2d3748;
+        }
+
+        .suggestion-btn:hover {
+            border-color: #667eea;
+            background: #edf2f7;
+            transform: translateY(-2px);
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .chat-container {
+                height: 60vh;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .back-btn {
+                position: static;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo nav-logo-left">
+                <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="editor-codigo.html"><i class="fas fa-code"></i> Editor</a></li>
+                <li><a href="juego-memoria.html"><i class="fas fa-brain"></i> Juego Memoria</a></li>
+                <li><a href="realidad-virtual.html"><i class="fas fa-vr-cardboard"></i> Realidad Virtual</a></li>
+            </ul>
+            <div class="nav-logo nav-logo-right">
+                <a href="#">
+                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <a href="../index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+        <h1><i class="fas fa-robot"></i> Chat con IA</h1>
+        <p>Experimentá con inteligencia artificial conversacional</p>
+    </div>
+
+    <div class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2><i class="fas fa-brain"></i> Asistente UNLu</h2>
+                <p>Hacé preguntas sobre tecnología, programación o la universidad</p>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>¡Hola! Soy tu asistente virtual de la UNLu. ¿En qué puedo ayudarte hoy? Podés preguntarme sobre:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li>Tecnología y programación</li>
+                            <li>Carreras de la UNLu</li>
+                            <li>Consejos de estudio</li>
+                            <li>Y mucho más...</li>
+                        </ul>
+                        <div class="message-time">Ahora</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <i class="fas fa-robot"></i> Asistente está escribiendo...
+            </div>
+            
+            <div class="chat-input">
+                <div class="input-container">
+                    <input type="text" id="messageInput" placeholder="Escribí tu mensaje..." onkeypress="handleKeyPress(event)">
+                    <button class="send-btn" onclick="sendMessage()" id="sendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="suggestions">
+            <h2><i class="fas fa-lightbulb"></i> Preguntas Sugeridas</h2>
+            <div class="suggestion-buttons">
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Qué es la programación?')">
+                    <i class="fas fa-code"></i> ¿Qué es la programación?
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Qué carreras ofrece la UNLu?')">
+                    <i class="fas fa-graduation-cap"></i> ¿Qué carreras ofrece la UNLu?
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Cómo funciona la inteligencia artificial?')">
+                    <i class="fas fa-brain"></i> ¿Cómo funciona la IA?
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Qué es el desarrollo web?')">
+                    <i class="fas fa-globe"></i> ¿Qué es el desarrollo web?
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Cuáles son las mejores prácticas de estudio?')">
+                    <i class="fas fa-book"></i> Consejos de estudio
+                </button>
+                <button class="suggestion-btn" onclick="sendSuggestion('¿Qué lenguajes de programación debo aprender?')">
+                    <i class="fas fa-laptop-code"></i> Lenguajes de programación
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Base de conocimiento simple
+        const knowledgeBase = {
+            'programación': 'La programación es el proceso de crear instrucciones para que las computadoras realicen tareas específicas. Es como escribir una receta que la computadora puede seguir paso a paso.',
+            'html': 'HTML es el lenguaje de marcado estándar para crear páginas web. Define la estructura y el contenido de una página.',
+            'css': 'CSS es el lenguaje de estilos que se usa para dar formato y diseño a las páginas web. Controla colores, fuentes, layout, etc.',
+            'javascript': 'JavaScript es un lenguaje de programación que permite crear interactividad en las páginas web. Es fundamental para el desarrollo web moderno.',
+            'python': 'Python es un lenguaje de programación muy popular por su simplicidad y versatilidad. Se usa en web, IA, análisis de datos, etc.',
+            'inteligencia artificial': 'La inteligencia artificial (IA) es la simulación de procesos de inteligencia humana en máquinas. Incluye aprendizaje automático, procesamiento de lenguaje natural y más.',
+            'unlu': 'La Universidad Nacional de Luján (UNLu) es una universidad pública argentina ubicada en Luján, Buenos Aires. Ofrece carreras en diversas áreas como Sistemas, Agronomía, Ciencias Biológicas, etc.',
+            'sistemas': 'La Licenciatura en Sistemas de Información forma profesionales capaces de analizar, diseñar, implementar y gestionar sistemas informáticos.',
+            'carreras': 'La UNLu ofrece carreras como: Licenciatura en Sistemas de Información, Ingeniería Agronómica, Ciencias Biológicas, Comercio Internacional, Contador Público, y más.',
+            'estudio': 'Para estudiar mejor: organizá tu tiempo, tomá descansos regulares, practicá activamente, y no dudes en pedir ayuda cuando la necesites.',
+            'desarrollo web': 'El desarrollo web incluye crear sitios y aplicaciones web. Se divide en frontend (lo que ven los usuarios) y backend (la lógica del servidor).',
+            'lenguajes': 'Para empezar, te recomiendo: HTML y CSS para web, Python para principiantes, JavaScript para interactividad web, y Java para aplicaciones empresariales.'
+        };
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = `
+                <p>${content}</p>
+                <div class="message-time">${new Date().toLocaleTimeString()}</div>
+            `;
+            
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll al final
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.classList.add('show');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.classList.remove('show');
+        }
+
+        function generateResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            // Respuestas específicas
+            if (message.includes('hola') || message.includes('buenos días') || message.includes('buenas')) {
+                return '¡Hola! ¿Cómo estás? ¿En qué puedo ayudarte hoy?';
+            }
+            
+            if (message.includes('gracias')) {
+                return '¡De nada! Me alegra poder ayudarte. ¿Hay algo más en lo que pueda asistirte?';
+            }
+            
+            if (message.includes('adiós') || message.includes('chau') || message.includes('hasta luego')) {
+                return '¡Hasta luego! Ha sido un placer charlar contigo. ¡Que tengas un excelente día!';
+            }
+            
+            // Buscar en la base de conocimiento
+            for (const [key, value] of Object.entries(knowledgeBase)) {
+                if (message.includes(key)) {
+                    return value;
+                }
+            }
+            
+            // Respuestas generales
+            const generalResponses = [
+                'Interesante pregunta. ¿Podrías ser más específico?',
+                'Esa es una excelente consulta. Te recomiendo investigar más sobre el tema.',
+                'No tengo información específica sobre eso, pero puedo ayudarte con temas de tecnología y programación.',
+                '¡Buena pregunta! ¿Te interesa aprender más sobre programación o alguna tecnología específica?',
+                'Ese tema es muy amplio. ¿Hay algún aspecto en particular que te gustaría explorar?'
+            ];
+            
+            return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            // Agregar mensaje del usuario
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            // Deshabilitar botón mientras procesa
+            sendBtn.disabled = true;
+            
+            // Mostrar indicador de escritura
+            showTyping();
+            
+            // Simular procesamiento
+            setTimeout(() => {
+                hideTyping();
+                
+                // Generar respuesta
+                const response = generateResponse(message);
+                addMessage(response);
+                
+                // Habilitar botón
+                sendBtn.disabled = false;
+                messageInput.focus();
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function sendSuggestion(text) {
+            messageInput.value = text;
+            sendMessage();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Focus en el input al cargar
+        messageInput.focus();
+    </script>
+</body>
+</html> 

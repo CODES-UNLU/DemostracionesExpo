@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor de Código - Demo UNLu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            margin: 0;
+            padding-top: 80px;
+        }
+
+        /* Navbar styles */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10), 0 1.5px 0 #764ba2;
+            z-index: 1000;
+            border-bottom: 1.5px solid #e2e8f0;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+        .nav-logo img {
+            height: 44px;
+            transition: transform 0.3s cubic-bezier(.4,2,.6,1);
+            filter: drop-shadow(0 2px 8px rgba(102,126,234,0.10));
+        }
+        .nav-logo:hover img {
+            transform: scale(1.08) rotate(-2deg);
+        }
+        .menu {
+            display: flex;
+            list-style: none;
+            gap: 2.5rem;
+            margin: 0;
+            padding: 0;
+        }
+        .menu a {
+            text-decoration: none;
+            color: #2d3748;
+            font-weight: 600;
+            font-size: 1.08rem;
+            letter-spacing: 0.01em;
+            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+        }
+        .menu a:hover {
+            color: #fff;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
+        }
+        .nav-logo-right {
+            display: flex;
+            align-items: center;
+        }
+        /* Mejorar botones generales */
+        .btn, .btn.secondary, .btn.danger {
+            font-size: 1.08rem;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 1rem 2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 12px rgba(102,126,234,0.08);
+        }
+        .btn { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+        .btn.secondary { background: linear-gradient(135deg, #48bb78, #38a169); color: #fff; }
+        .btn.danger { background: linear-gradient(135deg, #e53e3e, #c53030); color: #fff; }
+        .btn:hover { filter: brightness(1.08) drop-shadow(0 2px 8px rgba(102,126,234,0.10)); }
+        /* Mejorar layout general */
+        .container {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            background: rgba(255,255,255,0.92);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(102,126,234,0.08);
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .example-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .example-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+        }
+
+        .example-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: white;
+        }
+
+        .example-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+
+        .example-card p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .example-tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .difficulty {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .difficulty.easy { color: #38a169; }
+        .difficulty.medium { color: #ed8936; }
+        .difficulty.hard { color: #e53e3e; }
+
+        @media (max-width: 768px) {
+            .menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(255, 255, 255, 0.95);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .menu.show {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .example-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="nav-logo nav-logo-left">
+                <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+            <ul class="menu">
+                <li><a href="../index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                <li><a href="../index.html#actividades"><i class="fas fa-gamepad"></i> Actividades</a></li>
+                <li><a href="../index.html#info"><i class="fas fa-info-circle"></i> Información</a></li>
+                <li><a href="../faq.html"><i class="fas fa-question-circle"></i> FAQ</a></li>
+            </ul>
+            <div class="nav-logo nav-logo-right">
+                <a href="#">
+                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+            <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir menú de navegación">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="header">
+        <h1><i class="fas fa-code"></i> Editor de Código Interactivo</h1>
+        <p>Elegí un ejemplo para experimentar con HTML, CSS y JavaScript en tiempo real</p>
+    </div>
+
+    <div class="container">
+        <div class="examples-grid">
+            <a href="ejemplo-hola-mundo.html" class="example-card">
+                <div class="example-icon">
+                    <i class="fas fa-hand-wave"></i>
+                </div>
+                <h3>Hola Mundo</h3>
+                <p>Un simple "Hola Mundo" con HTML básico. Perfecto para empezar a aprender los fundamentos de la programación web.</p>
+                <div class="example-tags">
+                    <span class="tag">HTML</span>
+                    <span class="tag">Básico</span>
+                </div>
+                <div class="difficulty easy">
+                    <i class="fas fa-star"></i>
+                    <span>Fácil - Para principiantes</span>
+                </div>
+            </a>
+
+            <a href="ejemplo-boton-animado.html" class="example-card">
+                <div class="example-icon">
+                    <i class="fas fa-mouse-pointer"></i>
+                </div>
+                <h3>Botón Animado</h3>
+                <p>Un botón interactivo con efectos CSS y JavaScript. Aprende sobre eventos, estilos y animaciones.</p>
+                <div class="example-tags">
+                    <span class="tag">HTML</span>
+                    <span class="tag">CSS</span>
+                    <span class="tag">JavaScript</span>
+                </div>
+                <div class="difficulty medium">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span>Intermedio - Con interactividad</span>
+                </div>
+            </a>
+
+            <a href="ejemplo-calculadora.html" class="example-card">
+                <div class="example-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3>Calculadora Simple</h3>
+                <p>Una calculadora funcional con JavaScript. Practica lógica de programación y manejo de eventos.</p>
+                <div class="example-tags">
+                    <span class="tag">HTML</span>
+                    <span class="tag">CSS</span>
+                    <span class="tag">JavaScript</span>
+                </div>
+                <div class="difficulty medium">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span>Intermedio - Lógica de programación</span>
+                </div>
+            </a>
+
+            <a href="ejemplo-animacion.html" class="example-card">
+                <div class="example-icon">
+                    <i class="fas fa-magic"></i>
+                </div>
+                <h3>Animación CSS</h3>
+                <p>Animaciones con CSS puro. Explora keyframes, transformaciones y efectos visuales avanzados.</p>
+                <div class="example-tags">
+                    <span class="tag">HTML</span>
+                    <span class="tag">CSS</span>
+                    <span class="tag">Animaciones</span>
+                </div>
+                <div class="difficulty hard">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span>Avanzado - CSS avanzado</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.querySelector('.menu');
+            menu.classList.toggle('show');
+        }
+
+        // Cerrar menú al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            const menu = document.querySelector('.menu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            if (menu.classList.contains('show') && 
+                !menu.contains(event.target) && 
+                !menuToggle.contains(event.target)) {
+                menu.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html> 

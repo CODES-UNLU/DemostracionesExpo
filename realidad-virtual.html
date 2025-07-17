@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realidad Virtual - Demo UNLu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #2d3748;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #718096;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .vr-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .vr-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .vr-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .vr-header p {
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .vr-scene {
+            height: 500px;
+            background: #1a202c;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .vr-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .vr-controls {
+            padding: 1.5rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .control-btn.secondary {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .control-btn.danger {
+            background: linear-gradient(135deg, #e53e3e, #c53030);
+        }
+
+        .experiences {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .experience-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .experience-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+
+        .experience-card h3 {
+            color: #2d3748;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .experience-card p {
+            color: #718096;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .experience-card .icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .info-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-section h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f7fafc;
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .info-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .info-item h3 {
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-item p {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d3748;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-warning {
+            display: none;
+            background: #fed7d7;
+            color: #c53030;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .vr-scene {
+                height: 300px;
+            }
+            
+            .back-btn {
+                position: static;
+                margin-bottom: 1rem;
+                display: inline-block;
+            }
+            
+            .mobile-warning {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-container" style="max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;justify-content:space-between;align-items:center;height:80px;">
+            <div class="nav-logo nav-logo-left">
+                <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+            <ul class="menu" style="display:flex;list-style:none;gap:2rem;margin:0;padding:0;">
+                <li><a href="editor-codigo.html"><i class="fas fa-code"></i> Editor</a></li>
+                <li><a href="ia-chat.html"><i class="fas fa-robot"></i> Chat IA</a></li>
+                <li><a href="juego-memoria.html"><i class="fas fa-brain"></i> Juego Memoria</a></li>
+            </ul>
+            <div class="nav-logo nav-logo-right">
+                <a href="#">
+                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="40" style="vertical-align: middle;" />
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <a href="../index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+
+    <div class="header">
+        <h1><i class="fas fa-vr-cardboard"></i> Realidad Virtual</h1>
+        <p>Experimentá con tecnologías inmersivas del futuro</p>
+    </div>
+
+    <div class="container">
+        <div class="mobile-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            Para una mejor experiencia, usá un dispositivo con giroscopio o un visor VR
+        </div>
+
+        <div class="experiences">
+            <div class="experience-card" onclick="loadExperience('solar')">
+                <div class="icon">
+                    <i class="fas fa-sun"></i>
+                </div>
+                <h3>Sistema Solar</h3>
+                <p>Explorá el sistema solar en 3D. Rotá la vista y descubrí los planetas y sus órbitas.</p>
+            </div>
+            
+            <div class="experience-card" onclick="loadExperience('molecule')">
+                <div class="icon">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <h3>Molécula 3D</h3>
+                <p>Interactuá con una molécula de agua en 3D. Rotá y explorá su estructura atómica.</p>
+            </div>
+            
+            <div class="experience-card" onclick="loadExperience('building')">
+                <div class="icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3>Arquitectura VR</h3>
+                <p>Recorré un edificio virtual. Experimentá la arquitectura del futuro con realidad virtual.</p>
+            </div>
+        </div>
+
+        <div class="vr-container">
+            <div class="vr-header">
+                <h2><i class="fas fa-cube"></i> Experiencia 3D Interactiva</h2>
+                <p>Usá el mouse para rotar la vista, la rueda para hacer zoom, y los controles para interactuar</p>
+            </div>
+            
+            <div class="vr-scene">
+                <canvas id="vrCanvas" class="vr-canvas"></canvas>
+            </div>
+            
+            <div class="vr-controls">
+                <div class="control-buttons">
+                    <button class="control-btn" onclick="resetView()">
+                        <i class="fas fa-home"></i> Resetear Vista
+                    </button>
+                    <button class="control-btn secondary" onclick="toggleAnimation()">
+                        <i class="fas fa-play"></i> Pausar/Reanudar
+                    </button>
+                    <button class="control-btn" onclick="changeColor()">
+                        <i class="fas fa-palette"></i> Cambiar Color
+                    </button>
+                    <button class="control-btn danger" onclick="fullscreen()">
+                        <i class="fas fa-expand"></i> Pantalla Completa
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-info-circle"></i> ¿Qué es la Realidad Virtual?</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Inmersión Visual</h3>
+                    <p>Te transporta a mundos virtuales completamente inmersivos</p>
+                </div>
+                
+                <div class="info-item">
+                    <div class="icon">
+                        <i class="fas fa-hand-pointer"></i>
+                    </div>
+                    <h3>Interacción Natural</h3>
+                    <p>Interactuá con objetos virtuales usando gestos y movimientos</p>
+                </div>
+                
+                <div class="info-item">
+                    <div class="icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Educación</h3>
+                    <p>Revoluciona la forma de aprender con experiencias prácticas</p>
+                </div>
+                
+                <div class="info-item">
+                    <div class="icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3>Entretenimiento</h3>
+                    <p>Nueva forma de jugar y experimentar contenido multimedia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, cube, sphere, torus;
+        let isAnimating = true;
+        let currentExperience = 'solar';
+        let colors = ['#667eea', '#764ba2', '#48bb78', '#ed8936', '#e53e3e'];
+
+        function init() {
+            const canvas = document.getElementById('vrCanvas');
+            
+            // Escena
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a202c);
+            
+            // Cámara
+            camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.shadowMap.enabled = true;
+            
+            // Luces
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+            
+            // Cargar experiencia inicial
+            loadExperience('solar');
+            
+            // Eventos
+            setupEvents();
+            
+            // Animación
+            animate();
+        }
+
+        function loadExperience(type) {
+            // Limpiar escena
+            scene.children = scene.children.filter(child => child.type === 'AmbientLight' || child.type === 'DirectionalLight');
+            
+            currentExperience = type;
+            
+            switch(type) {
+                case 'solar':
+                    createSolarSystem();
+                    break;
+                case 'molecule':
+                    createMolecule();
+                    break;
+                case 'building':
+                    createBuilding();
+                    break;
+            }
+        }
+
+        function createSolarSystem() {
+            // Sol
+            const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
+            const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+            const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+            scene.add(sun);
+            
+            // Tierra
+            const earthGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+            const earthMaterial = new THREE.MeshLambertMaterial({ color: 0x0066ff });
+            const earth = new THREE.Mesh(earthGeometry, earthMaterial);
+            earth.position.x = 3;
+            scene.add(earth);
+            
+            // Luna
+            const moonGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+            const moonMaterial = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+            const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+            moon.position.x = 3.5;
+            scene.add(moon);
+            
+            // Órbita
+            const orbitGeometry = new THREE.RingGeometry(3, 3.1, 64);
+            const orbitMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0xffffff, 
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.3
+            });
+            const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+            orbit.rotation.x = Math.PI / 2;
+            scene.add(orbit);
+        }
+
+        function createMolecule() {
+            // Átomo de oxígeno
+            const oxygenGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const oxygenMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+            const oxygen = new THREE.Mesh(oxygenGeometry, oxygenMaterial);
+            oxygen.position.x = 0.5;
+            scene.add(oxygen);
+            
+            // Átomos de hidrógeno
+            const hydrogenGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+            const hydrogenMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+            
+            const hydrogen1 = new THREE.Mesh(hydrogenGeometry, hydrogenMaterial);
+            hydrogen1.position.x = -0.8;
+            hydrogen1.position.y = 0.3;
+            scene.add(hydrogen1);
+            
+            const hydrogen2 = new THREE.Mesh(hydrogenGeometry, hydrogenMaterial);
+            hydrogen2.position.x = -0.8;
+            hydrogen2.position.y = -0.3;
+            scene.add(hydrogen2);
+            
+            // Enlaces
+            const bondGeometry = new THREE.CylinderGeometry(0.05, 0.05, 1.3);
+            const bondMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            const bond1 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond1.position.x = -0.15;
+            bond1.position.y = 0.15;
+            bond1.rotation.z = Math.PI / 6;
+            scene.add(bond1);
+            
+            const bond2 = new THREE.Mesh(bondGeometry, bondMaterial);
+            bond2.position.x = -0.15;
+            bond2.position.y = -0.15;
+            bond2.rotation.z = -Math.PI / 6;
+            scene.add(bond2);
+        }
+
+        function createBuilding() {
+            // Base del edificio
+            const baseGeometry = new THREE.BoxGeometry(3, 0.5, 3);
+            const baseMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = -1;
+            scene.add(base);
+            
+            // Torre principal
+            const towerGeometry = new THREE.BoxGeometry(2, 4, 2);
+            const towerMaterial = new THREE.MeshLambertMaterial({ color: 0x667eea });
+            const tower = new THREE.Mesh(towerGeometry, towerMaterial);
+            tower.position.y = 1;
+            scene.add(tower);
+            
+            // Ventanas
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 4; j++) {
+                    const windowGeometry = new THREE.BoxGeometry(0.3, 0.5, 0.1);
+                    const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x87ceeb });
+                    const window = new THREE.Mesh(windowGeometry, windowMaterial);
+                    window.position.set(-0.5 + i * 0.5, -0.5 + j * 0.8, 1.1);
+                    scene.add(window);
+                }
+            }
+            
+            // Techo
+            const roofGeometry = new THREE.ConeGeometry(1.5, 1, 4);
+            const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 3.5;
+            scene.add(roof);
+        }
+
+        function setupEvents() {
+            const canvas = document.getElementById('vrCanvas');
+            let isMouseDown = false;
+            let mouseX = 0;
+            let mouseY = 0;
+            
+            canvas.addEventListener('mousedown', (event) => {
+                isMouseDown = true;
+                mouseX = event.clientX;
+                mouseY = event.clientY;
+            });
+            
+            canvas.addEventListener('mouseup', () => {
+                isMouseDown = false;
+            });
+            
+            canvas.addEventListener('mousemove', (event) => {
+                if (isMouseDown) {
+                    const deltaX = event.clientX - mouseX;
+                    const deltaY = event.clientY - mouseY;
+                    
+                    camera.position.x += deltaX * 0.01;
+                    camera.position.y -= deltaY * 0.01;
+                    
+                    camera.lookAt(0, 0, 0);
+                    
+                    mouseX = event.clientX;
+                    mouseY = event.clientY;
+                }
+            });
+            
+            canvas.addEventListener('wheel', (event) => {
+                const zoomSpeed = 0.1;
+                camera.position.z += event.deltaY * zoomSpeed;
+                camera.position.z = Math.max(1, Math.min(20, camera.position.z));
+            });
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = canvas.clientWidth / canvas.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            if (isAnimating) {
+                scene.children.forEach(child => {
+                    if (child.type === 'Mesh' && child !== cube) {
+                        child.rotation.x += 0.01;
+                        child.rotation.y += 0.01;
+                    }
+                });
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        function resetView() {
+            camera.position.set(0, 0, 5);
+            camera.lookAt(0, 0, 0);
+            // Reiniciar variables de control de cámara si existen
+            // (En este caso, solo aseguramos que no haya drag activo)
+            if (typeof isMouseDown !== 'undefined') isMouseDown = false;
+        }
+
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            const btn = document.querySelector('.control-btn.secondary i');
+            btn.className = isAnimating ? 'fas fa-pause' : 'fas fa-play';
+        }
+
+        function changeColor() {
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+            scene.children.forEach(child => {
+                if (child.type === 'Mesh' && child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(mat => {
+                            if (mat.color) mat.color.setStyle(randomColor);
+                        });
+                    } else {
+                        if (child.material.color) child.material.color.setStyle(randomColor);
+                    }
+                }
+            });
+        }
+
+        function fullscreen() {
+            const canvas = document.getElementById('vrCanvas');
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        }
+
+        // Inicializar cuando se carga la página
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html> 
