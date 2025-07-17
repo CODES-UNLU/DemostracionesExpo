@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         * {
             margin: 0;
@@ -276,18 +277,22 @@
         <div class="nav-container">
             <div class="nav-logo nav-logo-left">
                 <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
-                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="44" style="vertical-align: middle;" />
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="44" />
                 </a>
             </div>
-            <ul class="menu">
+            <ul class="menu" id="mainMenu">
+                <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
                 <li><a href="editor-codigo.html"><i class="fas fa-code"></i> Editor</a></li>
                 <li><a href="ia-chat.html"><i class="fas fa-robot"></i> Chat IA</a></li>
-                <li><a href="juego-memoria.html"><i class="fas fa-brain"></i> Juego Memoria</a></li>
+                <li><a href="juego-memoria.html"><i class="fas fa-gamepad"></i> Juego de Memoria</a></li>
             </ul>
-            <div class="nav-logo nav-logo-right">
-                <a href="#">
-                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="44" style="vertical-align: middle;" />
+            <div class="nav-right">
+                <a href="https://codes-unlu.github.io/Web-Codes/" class="nav-logo">
+                    <img src="logo-sin-fondo.png" alt="Logo CODES++ Centro de Estudiantes" height="44" />
                 </a>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -668,6 +673,14 @@
 
         // Inicializar cuando se carga la página
         window.addEventListener('load', init);
+    </script>
+    <script>
+        // Navbar hamburguesa
+        const menuToggle = document.getElementById('menuToggle');
+        const mainMenu = document.getElementById('mainMenu');
+        menuToggle.addEventListener('click', () => {
+          mainMenu.classList.toggle('show');
+        });
     </script>
 </body>
 </html> 

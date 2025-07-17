@@ -8,174 +8,29 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #2d3748;
-            height: 100vh;
-            overflow: hidden;
-        }
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            z-index: 1000;
-        }
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
-        .nav-logo img { height: 40px; transition: transform 0.3s ease; }
-        .nav-logo:hover img { transform: scale(1.05); }
-        .menu { display: flex; list-style: none; gap: 2rem; margin: 0; padding: 0; }
-        .menu a { text-decoration: none; color: #2d3748; font-weight: 500; transition: color 0.3s ease; display: flex; align-items: center; gap: 0.5rem; }
-        .menu a:hover { color: #667eea; }
-        .nav-logo-right { display: flex; align-items: center; }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 100px 2rem 0 2rem; /* padding-top para dejar espacio al navbar */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: calc(100vh - 80px);
-            box-sizing: border-box;
-        }
-        .game-board {
-            background: rgba(255,255,255,0.95);
-            border-radius: 16px;
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 320px;
-            min-width: 320px;
-            width: auto;
-            height: auto;
-        }
-        .cards-grid {
-            display: grid;
-            gap: 1rem;
-            width: 100%;
-            height: 100%;
-        }
-        .card {
-            aspect-ratio: 1;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease, transform 0.5s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            color: white;
-            position: relative;
-            transform-style: preserve-3d;
-            user-select: none;
-        }
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-        .card .card-front {
-            z-index: 2;
-        }
-        .card .card-back {
-            z-index: 1;
-        }
-        .card.flipped, .card.matched {
-            cursor: default;
-            pointer-events: none;
-        }
-        .card-front, .card-back {
-            position: absolute;
-            width: 100%; height: 100%;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-        }
-        .card-front {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        .card-back {
-            background: white;
-            color: #2d3748;
-            transform: rotateY(180deg);
-            border: 2px solid #e2e8f0;
-        }
-        .card.matched {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            border: 2px solid #38a169;
-        }
-        .card.matched .card-back, .card.matched .card-front {
-            background: linear-gradient(135deg, #48bb78, #38a169);
-            color: white;
-            border-color: #38a169;
-        }
-        .game-info {
-            background: rgba(255,255,255,0.95);
-            border-radius: 16px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .info-item { text-align: center; }
-        .info-item .label { font-size: 0.9rem; color: #718096; margin-bottom: 0.5rem; }
-        .info-item .value { font-size: 1.5rem; font-weight: 700; color: #2d3748; }
-        .controls { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 1.5rem; box-shadow: 0 20px 40px rgba(0,0,0,0.1); text-align: center; }
-        .btn { padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s ease; margin: 0 0.5rem; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(102,126,234,0.3); }
-        .btn.secondary { background: linear-gradient(135deg, #48bb78, #38a169); }
-        .btn.danger { background: linear-gradient(135deg, #e53e3e, #c53030); }
-        .fullscreen-btn { position: absolute; top: 1rem; right: 1rem; z-index: 10; background: #fff; color: #667eea; border: 2px solid #667eea; border-radius: 8px; padding: 0.5rem 1rem; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; }
-        .fullscreen-btn:hover { background: #667eea; color: #fff; }
-        .message { background: rgba(255,255,255,0.95); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); display: none; }
-        .message.show { display: block; animation: slideIn 0.5s ease; }
-        .message.success { border-left: 4px solid #48bb78; }
-        .message.info { border-left: 4px solid #667eea; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <nav>
         <div class="nav-container">
             <div class="nav-logo nav-logo-left">
                 <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
-                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="44" style="vertical-align: middle;" />
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="44" />
                 </a>
             </div>
-            <ul class="menu">
+            <ul class="menu" id="mainMenu">
+                <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
                 <li><a href="editor-codigo.html"><i class="fas fa-code"></i> Editor</a></li>
                 <li><a href="ia-chat.html"><i class="fas fa-robot"></i> Chat IA</a></li>
-                <li><a href="realidad-virtual.html"><i class="fas fa-vr-cardboard"></i> Realidad Virtual</a></li>
+                <li><a href="realidad-virtual.html"><i class="fas fa-cube"></i> Realidad Virtual</a></li>
             </ul>
-            <div class="nav-logo nav-logo-right">
-                <a href="#">
-                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="44" style="vertical-align: middle;" />
+            <div class="nav-right">
+                <a href="https://codes-unlu.github.io/Web-Codes/" class="nav-logo">
+                    <img src="logo-sin-fondo.png" alt="Logo CODES++ Centro de Estudiantes" height="44" />
                 </a>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -352,6 +207,13 @@
             m.className = 'message';
         }
         window.onload = () => { initializeGame(); };
+
+        // Navbar hamburguesa
+        const menuToggle = document.getElementById('menuToggle');
+        const mainMenu = document.getElementById('mainMenu');
+        menuToggle.addEventListener('click', () => {
+          mainMenu.classList.toggle('show');
+        });
     </script>
 </body>
 </html> 

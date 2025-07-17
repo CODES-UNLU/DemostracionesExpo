@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
     <style>
         * {
             margin: 0;
@@ -20,88 +21,6 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: #2d3748;
-        }
-
-        /* Navbar styles (solo escritorio) */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.97);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 4px 24px rgba(102, 126, 234, 0.10), 0 1.5px 0 #764ba2;
-            z-index: 1000;
-            border-bottom: 1.5px solid #e2e8f0;
-        }
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 80px;
-        }
-        .nav-logo img {
-            height: 44px;
-            transition: transform 0.3s cubic-bezier(.4,2,.6,1);
-            filter: drop-shadow(0 2px 8px rgba(102,126,234,0.10));
-        }
-        .nav-logo:hover img {
-            transform: scale(1.08) rotate(-2deg);
-        }
-        .menu {
-            display: flex;
-            list-style: none;
-            gap: 2.5rem;
-            margin: 0;
-            padding: 0;
-        }
-        .menu a {
-            text-decoration: none;
-            color: #2d3748;
-            font-weight: 600;
-            font-size: 1.08rem;
-            letter-spacing: 0.01em;
-            transition: color 0.2s, background 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1.2rem;
-            border-radius: 8px;
-        }
-        .menu a:hover {
-            color: #fff;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 2px 12px rgba(102,126,234,0.10);
-        }
-        .nav-logo-right {
-            display: flex;
-            align-items: center;
-        }
-        /* Fin navbar escritorio */
-
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .header h1 {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-size: 2rem;
-            font-weight: 700;
-        }
-
-        .header p {
-            color: #718096;
-            margin-top: 0.5rem;
         }
 
         /* Mejorar input y botones del chat */
@@ -372,18 +291,22 @@
         <div class="nav-container">
             <div class="nav-logo nav-logo-left">
                 <a href="https://www.sistemas.unlu.edu.ar/" target="_blank">
-                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="40" style="vertical-align: middle;" />
+                    <img src="logoLSIUNLu.svg" alt="Logo Licenciatura en Sistemas de Información UNLu" height="44" />
                 </a>
             </div>
-            <ul class="menu">
+            <ul class="menu" id="mainMenu">
+                <li><a href="index.html"><i class="fas fa-home"></i> Inicio</a></li>
+                <li><a href="juego-memoria.html"><i class="fas fa-gamepad"></i> Juego de Memoria</a></li>
                 <li><a href="editor-codigo.html"><i class="fas fa-code"></i> Editor</a></li>
-                <li><a href="juego-memoria.html"><i class="fas fa-brain"></i> Juego Memoria</a></li>
-                <li><a href="realidad-virtual.html"><i class="fas fa-vr-cardboard"></i> Realidad Virtual</a></li>
+                <li><a href="realidad-virtual.html"><i class="fas fa-cube"></i> Realidad Virtual</a></li>
             </ul>
-            <div class="nav-logo nav-logo-right">
-                <a href="#">
-                    <img src="logo-sin-fondo.png" alt="Logo UNLu sin fondo" height="40" style="vertical-align: middle;" />
+            <div class="nav-right">
+                <a href="https://codes-unlu.github.io/Web-Codes/" class="nav-logo">
+                    <img src="logo-sin-fondo.png" alt="Logo CODES++ Centro de Estudiantes" height="44" />
                 </a>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú de navegación">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </div>
     </nav>
@@ -591,6 +514,13 @@
 
         // Focus en el input al cargar
         messageInput.focus();
+
+        // Navbar hamburguesa
+        const menuToggle = document.getElementById('menuToggle');
+        const mainMenu = document.getElementById('mainMenu');
+        menuToggle.addEventListener('click', () => {
+          mainMenu.classList.toggle('show');
+        });
     </script>
 </body>
 </html> 
